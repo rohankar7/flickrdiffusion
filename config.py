@@ -1,0 +1,15 @@
+data_dir = "./data"
+image_data = f"{data_dir}/Images"
+text_captions = f"{data_dir}/captions.txt"
+unet_batch_size = 1
+embedding_dim = 1024
+embedding_dir = f"./embeddings_{embedding_dim}"
+embedding_model = "ViT-g-14" # or "ViT-B-16"
+embedding_pretrained = "laion2b_s12b_b42k" # or "openai"
+unet_checkpoint_dir = "./checkpoints/ddpm"
+unet_num_epochs = 1000
+unet_stopping_patience = 50
+unet_optim_lr = 1e-4
+unet_group_size = 4
+unet_dropout = 0.
+unet_train_timesteps = 1000
