@@ -6,7 +6,16 @@ from config import *
 from tqdm import tqdm
 
 def save_embeddings():
-    return
+    os.makedirs(f"./{embedding_dir}", exist_ok=True)
+    model, device = get_embedding_model()
+    with open("./data/captions.txt", "r") as f:
+        for l in tqdm(f.readlines(), desc=f"Progress"):
+            img_name, caption = l.strip().split(".jpg,")
+            if caption[-1]==".":
+                caption = caption[:-2]
+            if f"{img_name}.pt" not in os.listdir(embedding_dir):
+                torch.save(get_text_embedding(model, caption, device), f"./{embedding_dir}/{img_name}.pt")
+    # return
 
 def get_embedding_model():
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")

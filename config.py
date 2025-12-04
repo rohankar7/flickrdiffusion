@@ -1,5 +1,24 @@
+tqdm_colors = ["#0867C5", "green", "blue", "red", "yellow", "#6707B0", "#FFDD22", "#00FFEF", "#DC442C"]
 data_dir = "./data"
-image_data = f"{data_dir}/Images"
+image_dir = f"{data_dir}/Images"
+resized_img_dir = f"{data_dir}/ResizedImages"
+image_res = 256
+vae_batch_size = 1
+vae_group_size = 4
+vae_num_epochs = 1000
+vae_stopping_patience = 50
+vae_hidden_dim_1 = 32 # 32, 64
+vae_latent_channels = 128 # 256, 512
+vae_beta_kld = 1
+vae_optim_lr = 1e-2
+vae_lambda_tvl = 1e-3
+vae_dropout = 0.
+vae_checkpoint_dir = "./checkpoints/vae"
+vae_weight = f"test_best_{image_res}_{vae_hidden_dim_1}_{vae_latent_channels}_beta_{vae_beta_kld}_tvl_{vae_lambda_tvl}_{vae_batch_size}_groups_{vae_group_size}"
+latent_dir = f"./latents_{image_res}_test"
+num_layers = 2
+latent_dim = image_res // (2 ** num_layers)
+# ////////////////////////////////////////////////
 text_captions = f"{data_dir}/captions.txt"
 unet_batch_size = 1
 embedding_dim = 1024
