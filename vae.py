@@ -4,37 +4,27 @@ import torch.nn.functional as F
 from config import *
 
 class VAE(nn.Module):
-    def __init__(self, latent_channels=vae_latent_channels):
+    def __init__(self):
         super().__init__()
         # Encoder
         self.encoder_conv = nn.Sequential(
-            nn.Conv2d(3, vae_hidden_dim_1, 4, 2, 1, bias=False),
-            nn.GroupNorm(vae_group_size, vae_hidden_dim_1), nn.ReLU(inplace=True),
-            nn.Conv2d(vae_hidden_dim_1, vae_hidden_dim_1 * 2, 4, 2, 1, bias=False),
-            nn.GroupNorm(vae_group_size, vae_hidden_dim_1 * 2), nn.ReLU(inplace=True),
-            nn.Conv2d(vae_hidden_dim_1 * 2, latent_channels, 4, 2, 1, bias=False),
-            nn.GroupNorm(vae_group_size, latent_channels), nn.ReLU(inplace=True),
-            # nn.Conv2d(vae_hidden_dim_1 * 4, vae_hidden_dim_1 * 8, 4, 2, 1, bias=False),
-            # nn.GroupNorm(vae_group_size, vae_hidden_dim_1 * 8), nn.ReLU(inplace=True),
-            # nn.Conv2d(vae_hidden_dim_1 * 8, latent_channels, 4, 2, 1, bias=False),
-            # nn.GroupNorm(vae_group_size, latent_channels), nn.ReLU(inplace=True),
+            nn.Conv2d(3, 32, 3, 1, 1, bias=False),
+            nn.GroupNorm(vae_group_size, 32), nn.ReLU(inplace=True),
+            nn.Conv2d(32, 128, 4, 2, 1, bias=False),
+            nn.GroupNorm(vae_group_size, 128), nn.ReLU(inplace=True),
+            nn.Conv2d(128, 128, 4, 2, 1, bias=False),
+            nn.GroupNorm(vae_group_size, 128), nn.ReLU(inplace=True),
         )
         # 1×1×1 convs give channel‑wise μ and log σ², shape = (B, latent_channels, 4, 4, 4)
-        self.conv_mu = nn.Conv2d(latent_channels, latent_channels, kernel_size=1)
-        self.conv_logvar = nn.Conv2d(latent_channels, latent_channels, kernel_size=1)
-        # self.conv_mu = nn.Linear(latent_channels, latent_channels)
-        # self.conv_logvar = nn.Linear(latent_channels, latent_channels)
+        self.conv_mu = nn.Conv2d(vae_latent_channels, vae_latent_channels, kernel_size=1)
+        self.conv_logvar = nn.Conv2d(vae_latent_channels, vae_latent_channels, kernel_size=1)
         # Decoder
         self.decoder_conv = nn.Sequential(
-            # nn.ConvTranspose2d(latent_channels, vae_hidden_dim_1 * 8, 4, 2, 1),
-            # nn.GroupNorm(vae_group_size, vae_hidden_dim_1 * 8), nn.ReLU(inplace=True),
-            # nn.ConvTranspose2d(vae_hidden_dim_1 * 8, vae_hidden_dim_1 * 4, 4, 2, 1),
-            # nn.GroupNorm(vae_group_size, vae_hidden_dim_1 * 4), nn.ReLU(inplace=True),
-            nn.ConvTranspose2d(latent_channels, vae_hidden_dim_1 * 2, 4, 2, 1),
-            nn.GroupNorm(vae_group_size, vae_hidden_dim_1 * 2), nn.ReLU(inplace=True),
-            nn.ConvTranspose2d(vae_hidden_dim_1 * 2, vae_hidden_dim_1, 4, 2, 1),
-            nn.GroupNorm(vae_group_size, vae_hidden_dim_1), nn.ReLU(inplace=True),
-            nn.ConvTranspose2d(vae_hidden_dim_1, 3, 4, 2, 1),
+            nn.ConvTranspose2d(128, 128, 4, 2, 1),
+            nn.GroupNorm(vae_group_size, 128), nn.ReLU(inplace=True),
+            nn.ConvTranspose2d(128, 32, 4, 2, 1),
+            nn.GroupNorm(vae_group_size, 32), nn.ReLU(inplace=True),
+            nn.ConvTranspose2d(32, 3, 3, 1, 1),
             nn.Sigmoid()
         )
     @staticmethod
