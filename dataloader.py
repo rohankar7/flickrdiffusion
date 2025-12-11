@@ -8,10 +8,10 @@ from PIL import Image
 import torchvision.transforms as T
 
 class ImageDataset(Dataset):
-    def __init__(self, file_names, size=512):
+    def __init__(self, file_names):
         self.file_names = file_names
         self.transform = T.Compose([
-            T.Resize((size, size)),
+            # T.Resize((image_res, image_res)),
             T.ToTensor(),  # -> CxHxW, values in [0,1]
         ])
     def __len__(self): return len(self.file_names)
@@ -21,7 +21,7 @@ class ImageDataset(Dataset):
         # assert image_data.shape == torch.Size([1, image_res, image_res]), f"Unexpected shape: {image_data.shape}"
         return self.transform(image_data)
 def image_dataloader():
-    image_paths = [os.path.join(resized_img_dir, path) for path in os.listdir(resized_img_dir) if path.endswith(".jpg")]
+    image_paths = [os.path.join(resized_img_dir, path) for path in os.listdir(resized_img_dir)[:] if path.endswith(".jpg")]
     dataset = ImageDataset(image_paths)
     train_size = int(0.8 * len(dataset))
     test_size = len(dataset) - train_size

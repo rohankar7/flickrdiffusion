@@ -7,6 +7,7 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau, LambdaLR
 from tqdm import tqdm
 from config import *
 from vae import *
+from vae_new import *
 import matplotlib.pyplot as plt
 from seed import seed_everything
 
@@ -14,7 +15,8 @@ def train_test_vae():
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     train_loader, test_loader = image_dataloader()
     # optimizer = optim.Adam(vae.parameters(), lr=5e-3, betas=(0.9, 0.999), weight_decay=1e-2)
-    vae = VAE(latent_channels = vae_latent_channels).to(device)
+    vae = VAE().to(device)
+    # vae = VAELinear().to(device)
     optimizer = optim.Adam(vae.parameters(), lr=vae_optim_lr, betas=(0.5, 0.999), weight_decay=0)
     scheduler = ReduceLROnPlateau(optimizer, mode='min', patience=5, factor=0.5)
     os.makedirs(f"{vae_checkpoint_dir}", exist_ok=True)
