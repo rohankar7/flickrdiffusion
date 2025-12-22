@@ -7,7 +7,7 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau, LambdaLR
 from tqdm import tqdm
 from config import *
 from vae import *
-from vae_new import *
+# from vae_new import *
 import matplotlib.pyplot as plt
 from seed import seed_everything
 
@@ -19,6 +19,8 @@ def train_test_vae():
     # vae = VAELinear().to(device)
     optimizer = optim.Adam(vae.parameters(), lr=vae_optim_lr, betas=(0.5, 0.999), weight_decay=0)
     scheduler = ReduceLROnPlateau(optimizer, mode='min', patience=5, factor=0.5)
+    # optimizer = torch.optim.AdamW(vae.parameters(), lr=vae_optim_lr, weight_decay=0.0001)
+    # scheduler = ReduceLROnPlateau(optimizer, mode='min', patience=3, factor=0.1,threshold=0.001)
     os.makedirs(f"{vae_checkpoint_dir}", exist_ok=True)
     num_epochs = vae_num_epochs
     early_stopping_patience = vae_stopping_patience
