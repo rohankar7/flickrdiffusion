@@ -11,10 +11,10 @@ vae_hidden_dim_1 = 32 # 32, 64
 vae_latent_channels = 128 # 256, 512
 vae_beta_kld = 1
 vae_optim_lr = 1e-4
-vae_lambda_tvl = 1e-3
+vae_lambda_tvl = 1e-3 # 1e-3
 vae_dropout = 0.
 vae_checkpoint_dir = "./checkpoints/vae"
-vae_weight = f"test_best_{image_res}_3_32_128_beta_{vae_beta_kld}_tvl_{vae_lambda_tvl}_batch_{vae_batch_size}"
+vae_weight = f"unflattened_test_best_{image_res}_3_32_128_128_128_beta_{vae_beta_kld}_tvl_{vae_lambda_tvl}_batch_{vae_batch_size}_lr_{vae_optim_lr}"
 latent_dir = f"./latents_{image_res}_test"
 # ////////////////////////////////////////////////
 text_captions = f"{data_dir}/captions.txt"

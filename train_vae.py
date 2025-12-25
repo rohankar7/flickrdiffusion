@@ -6,21 +6,31 @@ import os
 from torch.optim.lr_scheduler import ReduceLROnPlateau, LambdaLR
 from tqdm import tqdm
 from config import *
-from vae import *
-# from vae_new import *
+from vae import VAE
 import matplotlib.pyplot as plt
 from seed import seed_everything
+
+def total_variance_loss(x):
+    tvl_h = torch.pow(x[:, :, 1:, :] - x[:, :, :-1, :], 2).mean() # TV-L2
+    tvl_w = torch.pow(x[:, :, :, 1:] - x[:, :, :, :-1], 2).mean() # TV-L2
+    return (tvl_h + tvl_w)
+
+def get_annealed_beta(epoch, warmup_epochs=100, max_beta=vae_beta_kld): return max_beta * min(1, epoch / warmup_epochs)
+
+def vae_loss(recon_x, x, mu, logvar, beta_kld):
+    bce = F.l1_loss(recon_x, x, reduction="mean")
+    kld = torch.mean(-0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp(), dim=1))
+    tvl = total_variance_loss(recon_x)
+    return bce + kld*beta_kld + tvl*vae_lambda_tvl, bce, kld, tvl
 
 def train_test_vae():
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     train_loader, test_loader = image_dataloader()
     # optimizer = optim.Adam(vae.parameters(), lr=5e-3, betas=(0.9, 0.999), weight_decay=1e-2)
     vae = VAE().to(device)
-    # vae = VAELinear().to(device)
-    optimizer = optim.Adam(vae.parameters(), lr=vae_optim_lr, betas=(0.5, 0.999), weight_decay=0)
-    scheduler = ReduceLROnPlateau(optimizer, mode='min', patience=5, factor=0.5)
-    # optimizer = torch.optim.AdamW(vae.parameters(), lr=vae_optim_lr, weight_decay=0.0001)
-    # scheduler = ReduceLROnPlateau(optimizer, mode='min', patience=3, factor=0.1,threshold=0.001)
+    # vae = VAEFlat().to(device)
+    optimizer = optim.AdamW(vae.parameters(), lr=vae_optim_lr, betas=(0.9, 0.999), weight_decay=0.0001)
+    scheduler = ReduceLROnPlateau(optimizer, mode='min', patience=3, factor=0.5, threshold=0.001)
     os.makedirs(f"{vae_checkpoint_dir}", exist_ok=True)
     num_epochs = vae_num_epochs
     early_stopping_patience = vae_stopping_patience
